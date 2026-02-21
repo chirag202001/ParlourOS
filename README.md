@@ -1,179 +1,209 @@
-# ParlourOS 💇‍♀️
+# ParlourOS
 
 **Multi-tenant SaaS Salon & Parlour Management Platform for India**
 
-Built with Next.js 14 (App Router) · TypeScript · Prisma · PostgreSQL · Tailwind CSS · shadcn/ui
+Built with Next.js 14 (App Router) - TypeScript - Prisma - PostgreSQL - Tailwind CSS - shadcn/ui
+
+**Live Demo:** [parlour-os.vercel.app](https://parlour-os.vercel.app)
 
 ---
 
-## Features
-
-| Module | Description |
-|--------|-------------|
-| **Auth & RBAC** | Email/password login, JWT sessions, 5 roles (Owner, Manager, Reception, Staff, Accountant) with granular permissions |
-| **Multi-Tenant** | Isolated data per salon, slug-based tenant identification |
-| **Multi-Branch** | Manage multiple locations, branch-scoped data |
-| **Services** | Full CRUD, categories (Hair, Skin, Nails, Makeup, Spa, etc.), duration & GST rate |
-| **Customers** | Customer profiles, birthday tracking, visit history, consent management |
-| **Appointments** | Calendar booking, staff assignment, status workflow, walk-in / WhatsApp / phone sources |
-| **POS & Billing** | Invoice builder, line items (services + products), GST calculation (CGST + SGST), multi-payment support (Cash/Card/UPI), refunds |
-| **Packages** | Membership packages with session tracking, sell to customers, auto-expiry |
-| **Inventory** | Products (retail + consumable), vendors, purchase orders, stock ledger, low-stock alerts |
-| **Staff** | Staff profiles, attendance tracking, base salary + commission configuration |
-| **Marketing** | Message templates (WhatsApp/SMS/Email), campaign management, review links |
-| **Reports** | Revenue analytics, service mix, staff performance, customer retention cohorts, GST summary |
-| **Settings** | Business profile, branch management, invoice customization, role viewer, subscription management |
-| **Subscription** | 3-tier plans (Starter ₹999, Pro ₹2,499, Multi-Branch ₹4,999) with feature gating |
-
----
-
-## Tech Stack
-
-- **Framework:** Next.js 14+ (App Router, Server Components, Server Actions)
-- **Language:** TypeScript
-- **Database:** PostgreSQL (Neon-compatible)
-- **ORM:** Prisma
-- **Auth:** NextAuth.js v4 (Credentials provider, JWT strategy)
-- **UI:** Tailwind CSS + shadcn/ui + Radix UI primitives
-- **Icons:** Lucide React
-- **Validation:** Zod
-- **Payments:** Razorpay / Stripe (pluggable provider, stubbed)
-- **Messaging:** WhatsApp / SMS / Email (pluggable provider, stubbed)
-
----
-
-## Getting Started
+## Quick Start (Run Locally)
 
 ### Prerequisites
 
-- Node.js 18+
-- PostgreSQL database (local or [Neon](https://neon.tech))
-- npm or pnpm
+| Tool | Version | Install |
+|------|---------|---------|
+| **Node.js** | 18 or higher | [nodejs.org](https://nodejs.org) |
+| **PostgreSQL** | 14+ | [postgresql.org](https://www.postgresql.org/download/) or use [Neon](https://neon.tech) (free) |
+| **Git** | any | [git-scm.com](https://git-scm.com) |
 
-### 1. Clone & Install
+### Step 1 - Clone and Install
 
 ```bash
-git clone <your-repo-url> parlour-os
-cd parlour-os
+git clone https://github.com/chirag202001/ParlourOS.git
+cd ParlourOS
 npm install
 ```
 
-### 2. Configure Environment
-
-Copy `.env.example` to `.env` and fill in your values:
+### Step 2 - Configure Environment
 
 ```bash
 cp .env.example .env
 ```
 
-Required variables:
+Open `.env` and fill in these **3 required values**:
 
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `NEXTAUTH_SECRET` | Random 32+ char secret (`openssl rand -base64 32`) |
-| `NEXTAUTH_URL` | App URL (e.g. `http://localhost:3000`) |
+| Variable | What to put | Example |
+|----------|-------------|---------|
+| `DATABASE_URL` | Your PostgreSQL connection string | `postgresql://user:pass@localhost:5432/parlour_os` |
+| `NEXTAUTH_SECRET` | Any random string (32+ chars) | Run: `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` |
+| `NEXTAUTH_URL` | Your app URL | `http://localhost:3000` |
 
-### 3. Setup Database
+> **No local PostgreSQL?** Create a free database at [neon.tech](https://neon.tech) and copy the connection string.
+
+### Step 3 - Setup Database
 
 ```bash
-# Generate Prisma client
-npx prisma generate
-
-# Push schema to database (development)
-npx prisma db push
-
-# Seed with demo data
-npx prisma db seed
+npx prisma generate     # Generate the database client
+npx prisma db push      # Create all tables
+npx prisma db seed      # Load demo data (users, services, customers, etc.)
 ```
 
-### 4. Run Development Server
+### Step 4 - Start the App
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open **http://localhost:3000** in your browser. You will see the login page.
 
 ---
 
-## Demo Credentials
+## Demo Login Credentials
 
-| Role | Email | Password |
-|------|-------|----------|
-| Owner | `owner@demo.com` | `password123` |
-| Manager | `manager@demo.com` | `password123` |
-| Receptionist | `reception@demo.com` | `password123` |
-| Stylist | `anjali@demo.com` | `password123` |
-| Stylist | `meena@demo.com` | `password123` |
+The seed creates 5 demo users. Each role sees different modules in the sidebar:
+
+| Role | Email | Password | What they can access |
+|------|-------|----------|---------------------|
+| **Owner** | `owner@demo.com` | `password123` | Everything - full admin access |
+| **Manager** | `manager@demo.com` | `password123` | All modules except subscription management |
+| **Receptionist** | `reception@demo.com` | `password123` | Appointments, Services, Billing, Customers, Packages |
+| **Stylist** | `anjali@demo.com` | `password123` | Appointments, Services, Customers (view only) |
+| **Stylist** | `meena@demo.com` | `password123` | Appointments, Services, Customers (view only) |
+
+> On the login page, click any **Quick Demo Login** button to auto-fill the credentials, then press **Sign In**.
 
 ---
 
-## Project Structure
+## Module Guide
 
+### Dashboard
+Overview cards showing today's appointments, total customers, monthly revenue, and recent invoices. All roles see this page.
+
+### Appointments
+- Book appointments for walk-in, phone, or online customers
+- Assign staff and time slots
+- Track status: Booked > Confirmed > In Progress > Completed
+- Cancel or mark as No Show
+
+### Services
+- Create and manage salon services (Haircut, Facial, Waxing, etc.)
+- Set price, duration (minutes), category, and GST rate
+- Toggle services active/inactive
+
+### Customers
+- Maintain customer profiles with phone, email, gender, DOB
+- View visit history and spending
+- Track loyalty points and consent preferences
+
+### Billing / POS
+- Create invoices with multiple line items (services + products)
+- Auto-calculate GST (CGST + SGST split)
+- Accept payments: Cash, Card, UPI, or Split
+- Process refunds when needed
+
+### Packages
+- Create membership packages (e.g., "4 Haircuts + 1 Spa" for Rs 2,500)
+- Set validity period and total sessions
+- Sell packages to customers and track remaining sessions
+
+### Inventory
+- Manage products (retail + consumable) with cost and selling price
+- Track vendors and purchase orders
+- Stock ledger with auto-deduction on usage
+- Low-stock alerts based on reorder levels
+
+### Staff
+- Staff profiles with designation and joining date
+- Commission configuration (percentage-based)
+- Daily attendance tracking (Present / Absent / Half Day / Leave)
+
+### Reports
+- **Revenue Report:** Daily/weekly/monthly/yearly breakdown with charts
+- **Service Mix:** Which services are most popular and profitable
+- **Staff Performance:** Appointments completed per staff member
+- **Customer Retention:** Active, at-risk, and lapsed customer cohorts
+- **GST Summary:** Taxable value, CGST, SGST totals for filing
+- Export reports as CSV
+
+### Marketing
+- Create message templates for WhatsApp, SMS, and Email
+- Launch campaigns to customer segments
+- Manage Google/JustDial review links per branch
+
+### Settings
+- Update business name, GSTIN, tax rate, invoice prefix/footer
+- Add/edit/delete branches (name, address, phone, hours)
+- View roles and their permissions
+- Manage subscription plan
+
+---
+
+## Deploy to Vercel (Production)
+
+### Step 1 - Push to GitHub
+```bash
+git init
+git add -A
+git commit -m "Initial commit"
+gh repo create YourAppName --public --source=. --push
 ```
-parlour-os/
-├── prisma/
-│   ├── schema.prisma          # Database schema (30+ models)
-│   └── seed.ts                # Demo data seeder
-├── src/
-│   ├── app/
-│   │   ├── api/auth/          # NextAuth route handler
-│   │   ├── api/onboarding/    # Tenant + branch onboarding APIs
-│   │   ├── login/             # Login page
-│   │   ├── onboarding/        # 3-step onboarding wizard
-│   │   └── app/               # Authenticated app shell
-│   │       ├── dashboard/     # Dashboard with stats
-│   │       ├── services/      # Service management
-│   │       ├── customers/     # Customer CRM
-│   │       ├── appointments/  # Appointment booking
-│   │       ├── pos/           # Point of Sale / Billing
-│   │       ├── packages/      # Membership packages
-│   │       ├── inventory/     # Products & stock
-│   │       ├── staff/         # Staff & attendance
-│   │       ├── marketing/     # Templates & campaigns
-│   │       ├── reports/       # Analytics & reports
-│   │       └── settings/      # Configuration & billing
-│   ├── components/
-│   │   ├── layout/            # Sidebar & Topbar
-│   │   ├── ui/                # shadcn/ui components
-│   │   └── providers.tsx      # Session & tooltip providers
-│   ├── lib/
-│   │   ├── auth.ts            # NextAuth configuration
-│   │   ├── db.ts              # Prisma client singleton
-│   │   ├── rbac.ts            # Role-based access control
-│   │   ├── plans.ts           # Subscription plan definitions
-│   │   ├── audit.ts           # Audit log helper
-│   │   ├── utils.ts           # Utility functions
-│   │   ├── validations.ts     # Zod schemas
-│   │   └── providers/
-│   │       ├── messaging.ts   # WhatsApp/SMS/Email provider
-│   │       └── payments.ts    # Razorpay/Stripe provider
-│   └── types/
-│       └── next-auth.d.ts     # NextAuth type augmentation
-├── package.json
-├── tailwind.config.ts
-├── tsconfig.json
-└── next.config.js
+
+### Step 2 - Import in Vercel
+1. Go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository
+3. Vercel auto-detects Next.js - no config needed
+
+### Step 3 - Add Environment Variables
+In Vercel > Project > Settings > Environment Variables, add:
+
+| Key | Value |
+|-----|-------|
+| `DATABASE_URL` | Your production PostgreSQL URL (Neon/Supabase/etc.) |
+| `NEXTAUTH_SECRET` | A random 32+ char string |
+| `NEXTAUTH_URL` | Your Vercel domain (e.g., `https://your-app.vercel.app`) |
+
+### Step 4 - Setup Production Database
+After the first deploy, run these from your local machine with the production DATABASE_URL:
+
+```bash
+# Set the production DATABASE_URL
+export DATABASE_URL="your-production-connection-string"
+
+# Push schema and seed
+npx prisma db push
+npx prisma db seed
 ```
+
+Your app is now live!
 
 ---
 
-## Available Scripts
+## Available Commands
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start development server |
+| `npm run dev` | Start development server (http://localhost:3000) |
 | `npm run build` | Production build |
 | `npm start` | Start production server |
-| `npm run lint` | ESLint check |
-| `npm run db:generate` | Generate Prisma client |
-| `npm run db:push` | Push schema to database |
-| `npm run db:migrate` | Create migration |
-| `npm run db:seed` | Seed demo data |
-| `npm run db:studio` | Open Prisma Studio |
-| `npm run test` | Run Vitest unit tests |
-| `npm run test:e2e` | Run Playwright E2E tests |
+| `npm run lint` | Run ESLint |
+| `npx prisma generate` | Regenerate Prisma client |
+| `npx prisma db push` | Push schema changes to database |
+| `npx prisma db seed` | Seed demo data |
+| `npx prisma studio` | Open visual database browser |
+| `npm run test` | Run unit tests (Vitest) |
+| `npm run test:e2e` | Run E2E tests (Playwright) |
+
+---
+
+## Subscription Plans
+
+| Plan | Price | Branches | Staff | Key Features |
+|------|-------|----------|-------|--------------|
+| **Starter** | Rs 999/mo | 1 | 5 | Core POS, Services, Customers |
+| **Pro** | Rs 2,499/mo | 3 | 20 | + Inventory, Reports, Marketing |
+| **Multi-Branch** | Rs 4,999/mo | 10 | Unlimited | + Multi-branch, API, Priority Support |
 
 ---
 
@@ -187,38 +217,69 @@ ParlourOS supports Indian GST:
 
 ---
 
-## Subscription Plans
+## Tech Stack
 
-| Plan | Price | Branches | Staff | Key Features |
-|------|-------|----------|-------|--------------|
-| **Starter** | ₹999/mo | 1 | 5 | Core POS, Services, Customers |
-| **Pro** | ₹2,499/mo | 3 | 20 | + Inventory, Reports, Marketing |
-| **Multi-Branch** | ₹4,999/mo | 10 | Unlimited | + Multi-branch, API, Priority Support |
+- **Framework:** Next.js 14+ (App Router, Server Components, Server Actions)
+- **Language:** TypeScript
+- **Database:** PostgreSQL (Neon-compatible)
+- **ORM:** Prisma (30+ models)
+- **Auth:** NextAuth.js v4 (Credentials provider, JWT, 30-day sessions)
+- **UI:** Tailwind CSS + shadcn/ui + Radix UI primitives
+- **Icons:** Lucide React
+- **Validation:** Zod
+- **Payments:** Razorpay (pluggable provider)
+- **Messaging:** WhatsApp / SMS / Email (pluggable provider)
 
 ---
 
-## Deployment
+## Project Structure
 
-### Vercel (Recommended)
-
-1. Push to GitHub
-2. Import in [Vercel](https://vercel.com)
-3. Add environment variables
-4. Deploy
-
-### Docker
-
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npx prisma generate
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "start"]
 ```
+ParlourOS/
+|-- prisma/
+|   |-- schema.prisma          # 30+ database models
+|   |-- seed.ts                # Demo data seeder
+|-- src/
+|   |-- app/
+|   |   |-- login/             # Login page with demo buttons
+|   |   |-- onboarding/        # New tenant signup wizard
+|   |   |-- app/               # Main app (authenticated)
+|   |       |-- dashboard/     # Overview stats
+|   |       |-- appointments/  # Booking management
+|   |       |-- services/      # Service CRUD
+|   |       |-- customers/     # Customer CRM
+|   |       |-- pos/           # Billing and invoicing
+|   |       |-- packages/      # Memberships
+|   |       |-- inventory/     # Products and stock
+|   |       |-- staff/         # Staff and attendance
+|   |       |-- marketing/     # Campaigns and templates
+|   |       |-- reports/       # Analytics
+|   |       |-- settings/      # Configuration
+|   |-- components/
+|   |   |-- layout/            # Sidebar (role-filtered) and Topbar
+|   |   |-- ui/                # shadcn/ui components
+|   |-- lib/
+|       |-- auth.ts            # NextAuth config
+|       |-- rbac.ts            # Role-based access control
+|       |-- db.ts              # Prisma client
+|       |-- validations.ts     # Zod schemas
+|-- .env.example               # Environment template
+|-- package.json
+|-- tailwind.config.ts
+```
+
+---
+
+## Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| `Invalid email or password` | Run `npx prisma db seed` to create demo users |
+| `NO_SECRET` error on Vercel | Add `NEXTAUTH_SECRET` in Vercel environment variables |
+| `Forbidden: insufficient permissions` | Expected - the logged-in role does not have access to that module |
+| Database connection error | Check your `DATABASE_URL` in `.env` is correct |
+| `prisma generate` fails | Run `npm install` first, then `npx prisma generate` |
+| Blank page after login | Make sure `NEXTAUTH_URL` matches your actual app URL |
 
 ---
 
@@ -228,4 +289,4 @@ MIT
 
 ---
 
-Built with ❤️ for Indian beauty & wellness businesses.
+Built with love for Indian beauty and wellness businesses.
