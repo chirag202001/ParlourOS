@@ -86,8 +86,35 @@ export default function LoginPage() {
               Get Started
             </Link>
           </div>
-          <div className="mt-3 text-center text-xs text-muted-foreground">
-            Demo: owner@demo.com / password123
+
+          {/* Demo Quick Login Buttons */}
+          <div className="mt-5 border-t pt-4">
+            <p className="mb-3 text-center text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Quick Demo Login
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { label: '👑 Owner', email: 'owner@demo.com', color: 'bg-purple-100 hover:bg-purple-200 text-purple-700 border-purple-200' },
+                { label: '📋 Manager', email: 'manager@demo.com', color: 'bg-blue-100 hover:bg-blue-200 text-blue-700 border-blue-200' },
+                { label: '💇 Stylist', email: 'anjali@demo.com', color: 'bg-pink-100 hover:bg-pink-200 text-pink-700 border-pink-200' },
+                { label: '🖥️ Reception', email: 'reception@demo.com', color: 'bg-green-100 hover:bg-green-200 text-green-700 border-green-200' },
+              ].map((demo) => (
+                <button
+                  key={demo.email}
+                  type="button"
+                  className={`rounded-md border px-3 py-2 text-xs font-medium transition-colors ${demo.color}`}
+                  onClick={() => {
+                    setEmail(demo.email);
+                    setPassword('password123');
+                  }}
+                >
+                  {demo.label}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-center text-[10px] text-muted-foreground">
+              Click a role above, then press Sign In • Password: password123
+            </p>
           </div>
         </CardContent>
       </Card>
