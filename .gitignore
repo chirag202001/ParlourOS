@@ -9,3 +9,6 @@ playwright-report/
 test-results/
 .vercel
 .env*.local
+
+.env.production
+.env.local
