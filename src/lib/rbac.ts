@@ -121,18 +121,21 @@ export async function requirePermission(
   const user = await requireAuth();
   if (!user.tenantId) redirect('/onboarding');
 
-  // Owner has all permissions
-  const isOwner = user.roles.some((r) => r.key === 'OWNER');
+  // Owner has all permissions (case-insensitive)
+  const isOwner = user.roles.some((r) => r.key.toUpperCase() === 'OWNER');
   if (isOwner) return user;
+
+  // Normalize permission key aliases (read→view, write→manage)
+  const normalizedKey = normalizePermissionKey(permissionKey);
 
   // Check if user has the permission through any of their roles
   const userRoleKeys = user.roles
     .filter((r) => !branchId || !r.branchId || r.branchId === branchId)
-    .map((r) => r.key);
+    .map((r) => r.key.toUpperCase());
 
   const hasPermission = userRoleKeys.some((roleKey) => {
     const permissions = DEFAULT_ROLE_PERMISSIONS[roleKey] || [];
-    return permissions.includes(permissionKey);
+    return permissions.includes(normalizedKey) || permissions.includes(permissionKey);
   });
 
   if (!hasPermission) {
@@ -143,17 +146,36 @@ export async function requirePermission(
 }
 
 export function hasPermission(user: SessionUser, permissionKey: string, branchId?: string): boolean {
-  const isOwner = user.roles.some((r) => r.key === 'OWNER');
+  const isOwner = user.roles.some((r) => r.key.toUpperCase() === 'OWNER');
   if (isOwner) return true;
+
+  const normalizedKey = normalizePermissionKey(permissionKey);
 
   const userRoleKeys = user.roles
     .filter((r) => !branchId || !r.branchId || r.branchId === branchId)
-    .map((r) => r.key);
+    .map((r) => r.key.toUpperCase());
 
   return userRoleKeys.some((roleKey) => {
     const permissions = DEFAULT_ROLE_PERMISSIONS[roleKey] || [];
-    return permissions.includes(permissionKey);
+    return permissions.includes(normalizedKey) || permissions.includes(permissionKey);
   });
+}
+
+// Normalize legacy permission key aliases
+function normalizePermissionKey(key: string): string {
+  const aliases: Record<string, string> = {
+    'settings:read': 'settings:view',
+    'settings:write': 'settings:manage',
+    'reports:read': 'reports:view',
+    'reports:write': 'reports:export',
+    'marketing:read': 'marketing:view',
+    'marketing:write': 'marketing:manage',
+    'staff:read': 'staff:view',
+    'staff:write': 'staff:manage',
+    'subscription:read': 'subscription:manage',
+    'subscription:write': 'subscription:manage',
+  };
+  return aliases[key] || key;
 }
 
 export async function getUserBranches(userId: string) {
