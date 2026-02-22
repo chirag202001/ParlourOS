@@ -18,6 +18,7 @@ import {
   LogOut,
   Menu,
   X,
+  Upload,
 } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
@@ -45,13 +46,14 @@ const navItems = [
   { href: '/app/staff', label: 'Staff', icon: UserCog, permission: 'staff' },
   { href: '/app/reports', label: 'Reports', icon: BarChart3, permission: 'reports' },
   { href: '/app/marketing', label: 'Marketing', icon: Megaphone, permission: 'marketing' },
+  { href: '/app/import', label: 'Import Data', icon: Upload, permission: 'import' },
   { href: '/app/settings', label: 'Settings', icon: Settings, permission: 'settings' },
 ];
 
 // Which modules each role can access
 const ROLE_ACCESS: Record<string, Set<string | null>> = {
-  OWNER: new Set([null, 'appointments', 'services', 'billing', 'customers', 'packages', 'inventory', 'staff', 'reports', 'marketing', 'settings']),
-  MANAGER: new Set([null, 'appointments', 'services', 'billing', 'customers', 'packages', 'inventory', 'staff', 'reports', 'marketing', 'settings']),
+  OWNER: new Set([null, 'appointments', 'services', 'billing', 'customers', 'packages', 'inventory', 'staff', 'reports', 'marketing', 'import', 'settings']),
+  MANAGER: new Set([null, 'appointments', 'services', 'billing', 'customers', 'packages', 'inventory', 'staff', 'reports', 'marketing', 'import', 'settings']),
   RECEPTION: new Set([null, 'appointments', 'services', 'billing', 'customers', 'packages']),
   STAFF: new Set([null, 'appointments', 'services', 'customers']),
   ACCOUNTANT: new Set([null, 'billing', 'reports', 'inventory', 'settings']),
